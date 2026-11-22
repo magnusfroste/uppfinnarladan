@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Uppfinnarlådan – kombinera delar och bygg något nytt</title>
+<meta name="description" content="Kombinera två saker till något nytt, och använd det du byggt. Ett gratis pusselspel för barn 4–8 år där varje uppfinning blir en byggsten i nästa. Inloggning, reklam och köp finns inte.">
+<link rel="canonical" href="https://uppfinnarladan.shipholm.dev/">
+<meta name="theme-color" content="#2f6f9f">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Uppfinnarlådan">
+<meta property="og:title" content="Uppfinnarlådan – bygg något nytt av det du har">
+<meta property="og:description" content="Dra ihop två saker och se vad de blir. Sedan använder du uppfinningen – och bygger vidare. För barn 4–8 år, på iPad, utan text.">
+<meta property="og:url" content="https://uppfinnarladan.shipholm.dev/">
+<meta property="og:image" content="https://uppfinnarladan.shipholm.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="sv_SE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="/fonts/fredoka-600.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+  @font-face{font-family:Fredoka;src:url(/fonts/fredoka-400.ttf) format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:Fredoka;src:url(/fonts/fredoka-500.ttf) format("truetype");font-weight:500;font-display:swap}
+  @font-face{font-family:Fredoka;src:url(/fonts/fredoka-600.ttf) format("truetype");font-weight:600;font-display:swap}
+  @font-face{font-family:Fredoka;src:url(/fonts/fredoka-700.ttf) format("truetype");font-weight:700;font-display:swap}
+</style>
+<link rel="stylesheet" href="/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["Game", "SoftwareApplication"],
+  "name": "Uppfinnarlådan",
+  "alternateName": "Uppfinnarlådan – kombinera och bygg",
+  "url": "https://uppfinnarladan.shipholm.dev/",
+  "description": "Pusselspel där barn kombinerar två saker till en ny, och använder det de byggt för att komma vidare. Nivåerna blir djupare ju längre man spelar: först två delar, sedan byggstenar som behövs i nästa steg, till slut två grenar som möts.",
+  "applicationCategory": "EducationalApplication",
+  "applicationSubCategory": "Pusselspel",
+  "operatingSystem": "iPad, iPhone, Android, dator",
+  "inLanguage": "sv-SE",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "SEK" },
+  "audience": { "@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Barn 4–8 år" },
+  "educationalUse": ["Spel", "Problemlösning", "Konstruktion"],
+  "learningResourceType": "Spel",
+  "teaches": ["Kombinera delar till en helhet", "Bygga i rätt ordning", "Planera innan man handlar"],
+  "publisher": { "@type": "Organization", "name": "Skolappar", "url": "https://www.skolappar.com" },
+  "screenshot": "https://uppfinnarladan.shipholm.dev/kort.png"
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <header class="topp">
+    <div class="vanster">
+      <p class="namn">Uppfinnarlådan</p>
+      <p class="niva"><span data-niva>1/8</span></p>
+    </div>
+    <div class="steg" data-steg aria-hidden="true"></div>
+    <div class="ljudknappar">
+      <button type="button" class="liten" data-ljud data-lage="på" aria-pressed="true" aria-label="Ljud på eller av">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-4v14l-4-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>
+      </button>
+      <button type="button" class="liten" data-rost data-lage="på" aria-pressed="true" aria-label="Röst på eller av">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h3l4-4v12l-4-4H4z"/><path d="M14.5 9a4 4 0 0 1 0 6"/><path d="M17 6.5a8 8 0 0 1 0 11"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="scen">
+    <canvas id="duk" aria-label="Spelplan med saker att kombinera"></canvas>
+    <button type="button" class="nasta" data-nasta hidden>Nästa uppfinning</button>
+  </main>
+
+  <footer class="botten">
+    <div class="hylla" data-hylla aria-label="Det du byggt"></div>
+    <p class="tips">Dra en sak till en annan – eller tryck på två. Passar de blir det något nytt.</p>
+  </footer>
+</div>
+<script src="/app.js" defer></script>
+<!-- START:startskarm -->
+<style>
+  #startskarm {
+    position: fixed; inset: 0; z-index: 2147483000;
+    background: #faf7f2; color: #14181f;
+    font-family: "Fredoka", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid; place-items: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    overflow: auto;
+    opacity: 1; transition: opacity .22s ease;
+  }
+  #startskarm.dold { opacity: 0; pointer-events: none; }
+  #startskarm .start {
+    width: 100%; max-width: 620px; display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+  }
+  #startskarm .tile {
+    width: clamp(84px, 13vmin, 120px); height: clamp(84px, 13vmin, 120px);
+    border-radius: 26%; background: #e2e7e8;
+    box-shadow: 0 10px 30px -14px rgba(20,24,31,.35), inset 0 0 0 1px rgba(20,24,31,.06);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  #startskarm .tile img { width: 100%; height: 100%; display: block; }
+  #startskarm h1 {
+    margin: clamp(18px, 3.2vmin, 30px) 0 0;
+    font-size: clamp(38px, 7.4vmin, 68px); line-height: 1.02;
+    letter-spacing: -0.028em; font-weight: 800; color: #14181f;
+  }
+  #startskarm .tag {
+    margin: clamp(8px, 1.4vmin, 14px) 0 0;
+    font-size: clamp(16px, 2.35vmin, 23px); line-height: 1.35;
+    color: #4a5260; max-width: 34ch;
+  }
+  #startskarm .chips {
+    list-style: none; display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px; padding: 0; margin: clamp(16px, 2.6vmin, 24px) 0 0;
+  }
+  #startskarm .chips li {
+    font-size: clamp(12px, 1.5vmin, 14px); font-weight: 600; letter-spacing: .01em;
+    padding: 7px 13px; border-radius: 999px; color: #265376; background: #e2e7e8;
+  }
+  #startskarm .play {
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-top: clamp(24px, 4vmin, 38px);
+    padding: clamp(15px, 2.1vmin, 20px) clamp(34px, 5.4vmin, 52px);
+    border: 0; border-radius: 999px; background: #2f6f9f; color: #fff;
+    font: inherit; font-size: clamp(18px, 2.4vmin, 24px); font-weight: 700;
+    letter-spacing: -0.01em; cursor: pointer;
+    box-shadow: 0 14px 28px -14px #2f6f9f99;
+    transition: transform .16s ease; -webkit-tap-highlight-color: transparent;
+  }
+  #startskarm .play:hover { transform: translateY(-1px); }
+  #startskarm .play:active { transform: scale(.985); }
+  #startskarm .play svg { width: 1em; height: 1em; }
+  #startskarm .note {
+    margin: clamp(18px, 2.6vmin, 26px) 0 0;
+    font-size: clamp(12px, 1.5vmin, 14px); color: #4a5260; opacity: .8;
+  }
+  #startskarm .note a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(74,82,96,.3); }
+  #startskarm .lgr22 {
+    margin: clamp(14px, 2.2vmin, 20px) 0 0; max-width: 46ch;
+    font-size: clamp(12px, 1.45vmin, 13.5px); color: #4a5260;
+    text-align: left;
+  }
+  #startskarm .lgr22 summary {
+    list-style: none; cursor: pointer; text-align: center;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    opacity: .72; padding: 6px 2px; border-radius: 8px;
+  }
+  #startskarm .lgr22 summary::-webkit-details-marker { display: none; }
+  #startskarm .lgr22 summary:hover, #startskarm .lgr22 summary:focus-visible { opacity: 1; }
+  #startskarm .lgr22 summary:focus-visible { outline: 2px solid #2f6f9f66; outline-offset: 2px; }
+  #startskarm .lgr22-info {
+    width: 15px; height: 15px; border-radius: 50%; display: grid; place-items: center;
+    background: #e2e7e8; color: #265376; font-size: 10px; font-weight: 700;
+    font-style: normal; line-height: 1; flex: 0 0 auto;
+  }
+  #startskarm .lgr22-pil { transition: transform .18s ease; font-size: .9em; }
+  #startskarm .lgr22[open] summary { opacity: 1; }
+  #startskarm .lgr22[open] .lgr22-pil { transform: rotate(90deg); }
+  #startskarm .lgr22-kropp {
+    margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+    background: #e2e7e8; line-height: 1.45;
+  }
+  #startskarm .lgr22-kropp p { margin: 0; }
+  #startskarm .lgr22-amne { font-weight: 600; color: #265376; }
+  #startskarm .lgr22-kropp blockquote {
+    margin: 7px 0 0; padding-left: 10px; border-left: 2px solid #2f6f9f44;
+    font-style: italic;
+  }
+  #startskarm .lgr22-kalla { margin-top: 5px !important; font-size: .92em; opacity: .75; }
+  #startskarm .lgr22-koppling { margin-top: 8px !important; }
+  @media (max-height: 470px) {
+    #startskarm h1 { font-size: clamp(30px, 6vmin, 44px); }
+    #startskarm .tag, #startskarm .note, #startskarm .lgr22 { display: none; }
+    #startskarm .play { margin-top: 20px; }
+  }
+</style>
+<div id="startskarm" role="dialog" aria-label="Uppfinnarlådan" data-play-href="/">
+  <div class="start">
+    <div class="tile"><img src="/icon-512.png" alt="" width="512" height="512"></div>
+    <h1>Uppfinnarlådan</h1>
+    <p class="tag">kombinera två saker – få något nytt</p>
+    <ul class="chips"><li>Pussel</li><li>Kombinera</li><li>Förskola till åk 3</li></ul>
+    <button class="play" type="button" data-play-href="/">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11-6.86a1 1 0 0 0 0-1.7l-11-6.86A1 1 0 0 0 8 5.14Z"/></svg>
+      Spela
+    </button>
+    <p class="note">Gratis · ingen inloggning · <a href="https://www.skolappar.com">skolappar.com</a></p>
+    
+  </div>
+</div>
+<script>
+  (function () {
+    var s = document.getElementById('startskarm');
+    var path = location.pathname.replace(/index[.]html$/, '');
+    if (path !== '/' && path !== '') { s.remove(); return; }
+    var d = document.documentElement, b = document.body;
+    var prev = [d.style.overflow, b.style.overflow];
+    d.style.overflow = 'hidden'; b.style.overflow = 'hidden';
+    s.querySelector('.play').addEventListener('click', function () {
+      d.style.overflow = prev[0]; b.style.overflow = prev[1];
+      s.classList.add('dold');
+      s.setAttribute('aria-hidden', 'true');
+      setTimeout(function () { s.remove(); }, 240);
+      var to = s.getAttribute('data-play-href');
+      if (to && to !== '/' && to !== location.pathname) { location.href = to; }
+      document.dispatchEvent(new CustomEvent('startskarm:spela'));
+    });
+  })();
+</script>
+<!-- SLUT:startskarm -->
+</body>
+</html>
