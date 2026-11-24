@@ -627,6 +627,12 @@
     }
   }
 
+  /* ---------- skolappar ------------------------------------------------- */
+  // Anonyma räkningar till skolappar.com (kotten.js i index.html); appen fungerar utan.
+  function rapport(namn, värde) {
+    window.skolappar?.event(namn, värde);
+  }
+
   /* ---------- tillstånd -------------------------------------------------- */
   const S = {
     lage: "vantar", // vantar | spel | klart
@@ -693,6 +699,8 @@
     });
     S.lage = "spel";
     ritaHUD();
+    rapport("round_start");
+    rapport("level", S.niva + 1);
     säg("Bygg en " + DELAR[n.mål].namn + "!");
   }
 
@@ -742,6 +750,7 @@
       S.klarTid = performance.now();
       S.byggda.push(blir);
       LJUD.klar();
+      rapport("round_done");
       setTimeout(() => säg(GÖR[blir] || "Klart!"), 700);
       ritaHUD();
     }
@@ -751,6 +760,7 @@
   function felFörsök(a, b) {
     S.missar += 1;
     LJUD.nej();
+    rapport("hint");
     [a, b].forEach((d) => {
       d.skak = 0.4;
     });
@@ -1216,6 +1226,7 @@
         if (!röst && "speechSynthesis" in window) speechSynthesis.cancel();
       }
       knapp.classList.toggle("av", på);
+      if (på) rapport("sound_off");
     });
   }
   bindLjud(el.ljud, "ljud");
