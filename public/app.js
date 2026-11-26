@@ -628,7 +628,7 @@
   }
 
   /* ---------- skolappar ------------------------------------------------- */
-  // Anonyma räkningar till skolappar.com (kotten.js i index.html); appen fungerar utan.
+  // Anonyma räkningar till skolappar.org (kotten.js i index.html); appen fungerar utan.
   function rapport(namn, värde) {
     window.skolappar?.event(namn, värde);
   }
