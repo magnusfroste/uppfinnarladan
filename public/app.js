@@ -611,20 +611,17 @@
     },
   };
 
+  /* Allt tal är inspelat (röst omni) och ligger i ljud/. Text som bara finns
+     när appen körs läses av tjänsten. Saknas ljudet: texten syns, inget tal. */
+  const ETT_ORD = { papper: 1, tyg: 1, segel: 1, hjul: 1, batteri: 1, fönster: 1 };
+  function obest(nyckel) {
+    return (ETT_ORD[nyckel] ? "Ett " : "En ") + DELAR[nyckel].namn + "!";
+  }
+
   function säg(text) {
-    if (!röst || !("speechSynthesis" in window) || !text) return;
-    try {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "sv-SE";
-      u.rate = 0.95;
-      u.pitch = 1.05;
-      const r = speechSynthesis.getVoices().find((v) => /sv/i.test(v.lang));
-      if (r) u.voice = r;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    } catch (e) {
-      /* tal är en bonus, aldrig ett krav */
-    }
+    if (!röst || !text) return;
+    try { if (window.__rost && window.__rost(text)) return; } catch (e) {}
+    try { if (window.__rostSag) window.__rostSag(text); } catch (e) {}
   }
 
   /* ---------- skolappar ------------------------------------------------- */
@@ -744,7 +741,7 @@
     S.delar.push(ny);
     S.pop = 1;
     LJUD.smält();
-    säg("Ett " + DELAR[blir].namn + "!");
+    säg(obest(blir));
     if (blir === S.mål) {
       S.lage = "klart";
       S.klarTid = performance.now();
@@ -1223,7 +1220,7 @@
       if (slag === "ljud") ljud = !på;
       else {
         röst = !på;
-        if (!röst && "speechSynthesis" in window) speechSynthesis.cancel();
+        if (!röst && window.__rostStopp) window.__rostStopp();
       }
       knapp.classList.toggle("av", på);
       if (på) rapport("sound_off");
